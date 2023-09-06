@@ -64,9 +64,9 @@ builder.Services.AddSwaggerGen( c =>
     {
         Title = "IWCRM - Infowest CRM Api"
         ,
-        Description = "contentRootPath : "+ contentRootPath
+        Description = "contentRootPath : "+ (files.Count() > 0 ? files[ 0 ] : 0)
         ,
-        Version = "1.0.0 " + (files.Count() > 0 ? files[0] :0)
+        Version = "1.0.0 " 
     } );
     c.CustomSchemaIds( ( type ) => type.ToString()
         .Replace( "[", "_" )
