@@ -6,17 +6,18 @@ using System.Linq;
 
 namespace IWCRM.API.Controllers
 {
+    [ApiController]
+    [Route( "v1" )]
     public class PersonController : Controller
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
-
+        [HttpGet]
+        [Route( "persons" )]
         public async Task<ActionResult<List<Person>>> GetAll( [FromServices] DataContext context )
         {
-            var result = await context.Person.Include( x => x.IdAddress ).AsNoTracking().ToListAsync();
-            return result;
+            var persons = await context.Person.AsNoTracking().ToListAsync();
+
+            //var result = await context.Person.Include( x => x.IdAddress ).AsNoTracking().ToListAsync();
+            return persons;
         }
 
 
