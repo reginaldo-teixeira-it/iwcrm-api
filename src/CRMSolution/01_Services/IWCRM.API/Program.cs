@@ -33,8 +33,12 @@ builder.Services.AddResponseCompression( options =>
 //    } );
 
 // === Context
+string connectionString = string.Empty;
+if (builder.Environment.IsDevelopment())
+    connectionString = builder.Configuration.GetConnectionString( "DevConnection" ); 
+else
+    connectionString = builder.Configuration.GetConnectionString( "DefaultConnection" );
 
-string connectionString = builder.Configuration.GetConnectionString( "DefaultConnection" ); 
 builder.Services.AddDbContext<DataContext>( opt => opt.UseSqlite( connectionString ) );
 builder.Services.AddScoped<DataContext, DataContext>();
 
