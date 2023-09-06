@@ -53,24 +53,20 @@ builder.Services.AddSwaggerGen( c =>
 {
     string fileName = "iwcrm.db";
     string currentDirectory = Directory.GetCurrentDirectory();
-    string filePath = Path.Combine( currentDirectory, fileName );
-    // Access the web root path
-    string webRootPath = builder.Environment.WebRootPath;
-
     // Access the content root path
     string contentRootPath = builder.Environment.ContentRootPath;
+   // var arquivo = Directory.GetFiles( "/home/site/wwwroot" );
+    string searchPattern = "*.db";
 
-
-
-    string dbdirector = string.Concat("DirDB : ",fileName," - ",currentDirectory," - ",filePath);
-
+    string[] files = Directory.GetFiles( contentRootPath, searchPattern );
+ 
     c.SwaggerDoc( "v1", new OpenApiInfo
     {
         Title = "IWCRM - Infowest CRM Api"
         ,
-        Description = "webRootPath : "+ webRootPath + " contentRootPath : "+ contentRootPath
+        Description = "contentRootPath : "+ contentRootPath
         ,
-        Version = "1.0.0 " + dbdirector
+        Version = "1.0.0 " + (files.Count() > 0 ? files[0] :0)
     } );
     c.CustomSchemaIds( ( type ) => type.ToString()
         .Replace( "[", "_" )
