@@ -1,4 +1,5 @@
 using IWCRM.API.Data;
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -53,6 +54,13 @@ builder.Services.AddSwaggerGen( c =>
     string fileName = "iwcrm.db";
     string currentDirectory = Directory.GetCurrentDirectory();
     string filePath = Path.Combine( currentDirectory, fileName );
+    // Access the web root path
+    string webRootPath = builder.Environment.WebRootPath;
+
+    // Access the content root path
+    string contentRootPath = builder.Environment.ContentRootPath;
+
+
 
     string dbdirector = string.Concat("DirDB : ",fileName," - ",currentDirectory," - ",filePath);
 
@@ -60,10 +68,10 @@ builder.Services.AddSwaggerGen( c =>
     {
         Title = "IWCRM - Infowest CRM Api"
         ,
-        Description = "Api para testes de arquitetura Data Driven"
+        Description = "webRootPath : "+ webRootPath + " contentRootPath : "+ contentRootPath
         ,
         Version = "1.0.0 " + dbdirector
-    } ); ;
+    } );
     c.CustomSchemaIds( ( type ) => type.ToString()
         .Replace( "[", "_" )
         .Replace( "]", "_" )
