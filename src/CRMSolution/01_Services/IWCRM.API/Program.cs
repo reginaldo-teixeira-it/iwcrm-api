@@ -50,14 +50,20 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen( c =>
 {
+    string fileName = "iwcrm.db";
+    string currentDirectory = Directory.GetCurrentDirectory();
+    string filePath = Path.Combine( currentDirectory, fileName );
+
+    string dbdirector = string.Concat("DirDB : ",fileName," - ",currentDirectory," - ",filePath);
+
     c.SwaggerDoc( "v1", new OpenApiInfo
     {
         Title = "IWCRM - Infowest CRM Api"
         ,
         Description = "Api para testes de arquitetura Data Driven"
         ,
-        Version = "1.0.0"
-    } );
+        Version = "1.0.0 " + dbdirector
+    } ); ;
     c.CustomSchemaIds( ( type ) => type.ToString()
         .Replace( "[", "_" )
         .Replace( "]", "_" )
