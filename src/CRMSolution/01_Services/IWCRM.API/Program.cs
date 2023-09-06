@@ -64,17 +64,40 @@ builder.Services.AddSwaggerGen( c =>
  
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
+    app.UseDeveloperExceptionPage();
+
+// Enable middleware to serve generated Swagger as a JSON endpoint.
+app.UseSwagger();
+
+// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+// specifying the Swagger JSON endpoint.
+
+app.UseSwaggerUI( c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint( "/swagger/v1/swagger.json", "MOA API V1" );
+    c.DocumentTitle = "IW Manager Onion Architecture";
+} );
+
+app.UseRouting();
+
+// global cors policy
+app.UseCors( x => x
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader() );
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseResponseCompression();
+app.UseStaticFiles();
+
+app.UseEndpoints( endpoints =>
+{
+    endpoints.MapControllers();
+} );
 
 app.Run();
