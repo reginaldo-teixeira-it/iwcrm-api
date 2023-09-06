@@ -10,3 +10,6 @@ Autorização do Swagger
 Disponibilidade da API :
 
 Microsoft Azure Devops
+
+DataBase : 
+SQLite
