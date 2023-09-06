@@ -58,13 +58,18 @@ builder.Services.AddSwaggerGen( c =>
    // var arquivo = Directory.GetFiles( "/home/site/wwwroot" );
     string searchPattern = "*.db";
 
-    string[] files = Directory.GetFiles( contentRootPath, searchPattern );
+    string[] files = Directory.GetFiles( contentRootPath );
+    string descritp = string.Empty;
+    foreach ( string file in files)
+    {
+        descritp += " - "+file;
+    }
  
     c.SwaggerDoc( "v1", new OpenApiInfo
     {
         Title = "IWCRM - Infowest CRM Api"
         ,
-        Description = "contentRootPath : "+ (files.Count() > 0 ? files[ 0 ] : 0)
+        Description = "PathDB : "+ ( files.Count() > 0 ? files[ 0 ] : 0)+" Conn "+ connectionString +" file "+ descritp
         ,
         Version = "1.0.0 " 
     } );

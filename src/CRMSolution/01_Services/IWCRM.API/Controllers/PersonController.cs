@@ -22,7 +22,6 @@ namespace IWCRM.API.Controllers
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }
