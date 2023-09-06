@@ -7,7 +7,7 @@ namespace IWCRM.API.Data
     {
         protected override void OnConfiguring(
             DbContextOptionsBuilder optionsBuilder )
-            => optionsBuilder.UseSqlite( connectionString: "DataSource=iwcrm.db;Cache=Shared" );
+            => optionsBuilder.UseSqlite( connectionString: "DataSource=Data\\DataBase\\iwcrm.db;Cache=Shared" );
 
         public DbSet<Person> Person { get; set; }
         public DbSet<Address> Address { get; set; }
