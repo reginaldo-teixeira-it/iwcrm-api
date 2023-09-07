@@ -14,16 +14,14 @@ namespace IWCRM.API.Controllers
         [Route( "persons" )]
         public async Task<ActionResult<List<Person>>> GetAll( [FromServices] DataContext context )
         {
+          return await context.Person.AsNoTracking().ToListAsync();
+        }
 
-            try
-            {
-                var persons = await context.Person.AsNoTracking().ToListAsync();
-                return persons;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+        [HttpGet]
+        [Route( "persons/{id:int}" )]
+        public async Task<ActionResult<Person>> GetById( [FromServices] DataContext context, int id )
+        {
+            return await context.Person.AsNoTracking().FirstOrDefaultAsync( x => x.Id == id );
         }
 
     }
