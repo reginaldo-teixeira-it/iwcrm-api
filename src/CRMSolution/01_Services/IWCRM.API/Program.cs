@@ -7,7 +7,6 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder( args );
 
-
 // Add services
 builder.Services.AddCors();
 builder.Services.AddResponseCompression( options =>
@@ -35,10 +34,7 @@ builder.Services.AddResponseCompression( options =>
 
 // === Context
 string connectionString = string.Empty;
-if (builder.Environment.IsDevelopment())
-    connectionString = builder.Configuration.GetConnectionString( "DevConnection" ); 
-else
-    connectionString = builder.Configuration.GetConnectionString( "DefaultConnection" );
+connectionString = builder.Configuration.GetConnectionString( "DefaultConnection" );
 
 builder.Services.AddDbContext<DataContext>( opt => opt.UseSqlite( connectionString ) );
 builder.Services.AddScoped<DataContext, DataContext>();
@@ -50,26 +46,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen( c =>
-{
-    string fileName = "iwcrm.db";
-    string currentDirectory = Directory.GetCurrentDirectory();
-    // Access the content root path
-    string contentRootPath = builder.Environment.ContentRootPath;
-   // var arquivo = Directory.GetFiles( "/home/site/wwwroot" );
-    string searchPattern = "*.db";
-
-    string[] files = Directory.GetFiles( contentRootPath );
-    string descritp = string.Empty;
-    foreach ( string file in files)
-    {
-        descritp += " - "+file;
-    }
- 
+{ 
     c.SwaggerDoc( "v1", new OpenApiInfo
     {
         Title = "IWCRM - Infowest CRM Api"
         ,
-        Description = "PathDB : "+ ( files.Count() > 0 ? files[ 0 ] : 0)+" Conn "+ connectionString +" file "+ descritp
+        Description = "Controle de Contatos"
         ,
         Version = "1.0.0 " 
     } );
@@ -94,8 +76,8 @@ app.UseSwagger();
 
 app.UseSwaggerUI( c =>
 {
-    c.SwaggerEndpoint( "/swagger/v1/swagger.json", "MOA API V1" );
-    c.DocumentTitle = "IW Manager Onion Architecture";
+    c.SwaggerEndpoint( "/swagger/v1/swagger.json", "CRM API V1" );
+    c.DocumentTitle = "IW CRM";
 } );
 
 app.UseRouting();
