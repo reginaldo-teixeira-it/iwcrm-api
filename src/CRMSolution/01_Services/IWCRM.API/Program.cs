@@ -1,9 +1,15 @@
 using IWCRM.API.Data;
+using IWCRM.API.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder( args );
 
@@ -17,20 +23,24 @@ builder.Services.AddResponseCompression( options =>
     options.EnableForHttps = true;
 } );
 // Add jwt Autenticator
-//var key = Encoding.ASCII.GetBytes( Settings.Secret );
-//builder.Services.AddAuthentication( JwtBearerDefaults.AuthenticationScheme )
-//    .AddJwtBearer( x =>
-//    {
-//        x.RequireHttpsMetadata = false;
-//        x.SaveToken = true;
-//        x.TokenValidationParameters = new TokenValidationParameters
-//        {
-//            ValidateIssuerSigningKey = true,
-//            IssuerSigningKey = new SymmetricSecurityKey( key ),
-//            ValidateIssuer = false,
-//            ValidateAudience = false
-//        };
-//    } );
+
+var key = Encoding.ASCII.GetBytes( Settings.Secret );
+builder.Services.AddAuthentication( x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+} ).AddJwtBearer( x =>
+{
+    x.RequireHttpsMetadata = false;
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey( key ),
+        ValidateIssuer = false,
+        ValidateAudience = false
+    };
+} );
 
 // === Context
 string connectionString = string.Empty;
@@ -40,8 +50,8 @@ builder.Services.AddDbContext<DataContext>( opt => opt.UseSqlite( connectionStri
 builder.Services.AddScoped<DataContext, DataContext>();
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
@@ -51,9 +61,9 @@ builder.Services.AddSwaggerGen( c =>
     {
         Title = "IWCRM - Infowest CRM Api"
         ,
-        Description = "Controle de Contatos"
+        Description = "Controle de Contatos, User : Admin Password : !Demo123"
         ,
-        Version = "1.0.0 " 
+        Version = "1.0.0 " ,
     } );
     c.CustomSchemaIds( ( type ) => type.ToString()
         .Replace( "[", "_" )
@@ -61,6 +71,35 @@ builder.Services.AddSwaggerGen( c =>
     .Replace( ",", "-" )
         .Replace( "`", "_" ) );
     c.ResolveConflictingActions( apiDescriptions => apiDescriptions.First() );
+
+    var security = new Dictionary<string, IEnumerable<string>>
+    {
+        {"Bearer", new string[] { } }
+    };
+
+    c.AddSecurityDefinition( "Bearer", new OpenApiSecurityScheme
+    {
+        Description = "Insira o token JWT desta maneira: Bearer {seu token}",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey
+    } );
+
+    c.AddSecurityRequirement( new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new List<string>()
+        }
+    } );
+
 } );
  
 var app = builder.Build();

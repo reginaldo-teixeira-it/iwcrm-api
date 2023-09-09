@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace IWCRM.API.Model
 {
-    public class Person
+    public class Person 
     {
         [Key]
         public long  Id { get; set; }
@@ -27,5 +27,6 @@ namespace IWCRM.API.Model
         [MaxLength( 11, ErrorMessage = "Este campo deve conter 11 caracteres" )]
         [MinLength( 8, ErrorMessage = "Este campo deve conter 11 caracteres" )]
         public string RGIE { get; set; }
+        public bool IsActive { get; set; }
     }
 }

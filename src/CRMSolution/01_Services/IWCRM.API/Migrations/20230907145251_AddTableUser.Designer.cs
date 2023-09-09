@@ -3,6 +3,7 @@ using System;
 using IWCRM.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IWCRM.API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230907145251_AddTableUser")]
+    partial class AddTableUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.10");
@@ -82,9 +85,6 @@ namespace IWCRM.API.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<long>("IdPersonType")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("LastName")

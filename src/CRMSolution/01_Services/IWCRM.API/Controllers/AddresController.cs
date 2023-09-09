@@ -3,45 +3,37 @@ using IWCRM.API.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace IWCRM.API.Controllers
 {
     [ApiController]
     [Authorize]
-    [Route( "v1/person" )]
-    public class PersonController : Controller
+    [Route( "v1/address" )]
+
+    public class AddresController : Controller
     {
         [HttpGet]
-        [Route( "get-all" )]
+        [Route( "getByid/{id:int}" )]
         [Authorize( Roles = "Administrator" )]
-        public async Task<ActionResult<List<Person>>> GetAll( [FromServices] DataContext context )
-        {
-          return await context.Person.AsNoTracking().ToListAsync();
-        }
 
-        [HttpGet]
-        [Route( "get-byid/{id:int}" )]
-        [Authorize( Roles = "Administrator" )]
-        public async Task<ActionResult<Person>> GetById( [FromServices] DataContext context, int id )
+        public async Task<ActionResult<Address>> GetById( [FromServices] DataContext context, int id )
         {
-            return await context.Person.AsNoTracking().FirstOrDefaultAsync( x => x.Id == id );
+            return await context.Address.AsNoTracking().FirstOrDefaultAsync( x => x.Id == id );
         }
 
         [HttpPost]
         [Route( "create" )]
         [Authorize( Roles = "Administrator" )]
-
-        public async Task<ActionResult<Person>> Create( [FromServices] DataContext context,[FromBody] Person model )
+        public async Task<ActionResult<Address>> Create( [FromServices] DataContext context, [FromBody] Address model )
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
             try
-            {  
-                context.Person.Add( model );
+            {
+                context.Address.Add( model );
                 await context.SaveChangesAsync();
- 
+
                 return model;
             }
             catch (Exception)
@@ -55,7 +47,7 @@ namespace IWCRM.API.Controllers
         [Route( "update/{id:int}" )]
         [Authorize( Roles = "Administrator" )]
 
-        public async Task<ActionResult<Person>> Update( [FromServices] DataContext context, [FromBody] Person model, int id)
+        public async Task<ActionResult<Address>> Update( [FromServices] DataContext context, [FromBody] Address model, int id )
         {
             if (!ModelState.IsValid)
                 return BadRequest( ModelState );
@@ -81,19 +73,18 @@ namespace IWCRM.API.Controllers
         [Route( "delete/{id:int}" )]
         [Authorize( Roles = "Administrator" )]
 
-        public async Task<ActionResult<Person>> Delete( [FromServices] DataContext context, [FromBody] Person model, int id )
+        public async Task<ActionResult<Address>> Delete( [FromServices] DataContext context, [FromBody] Address model, int id )
         {
             if (!ModelState.IsValid)
                 return BadRequest( ModelState );
 
-            // Verifica se o ID informado é o mesmo do modelo
-            if (id != model.Id)
-                return NotFound( new { message = "Pessoa não encontrada" } );
+            var category = await context.Address.FirstOrDefaultAsync( x => x.Id == id );
+            if (category == null)
+                return NotFound( new { message = "Endereço não encontrado" } );
 
             try
             {
-                model.IsActive = false;
-                context.Entry( model ).State = EntityState.Modified;
+                context.Address.Remove( category );
                 await context.SaveChangesAsync();
                 return model;
             }

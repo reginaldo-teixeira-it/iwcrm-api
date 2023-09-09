@@ -3,11 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34018.315
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IWCRM.API", "01_Services\IWCRM.API\IWCRM.API.csproj", "{E4647B1D-3917-40CD-86A0-8A0C6C6DBC3E}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00_UI", "00_UI", "{621EAF7A-806C-4657-8D09-308C6498812B}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01_Services", "01_Services", "{790511E7-CDDE-4147-80F7-3C76710BEED2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IWCRM.API", "01_Services\IWCRM.API\IWCRM.API.csproj", "{E4647B1D-3917-40CD-86A0-8A0C6C6DBC3E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,9 +18,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{E4647B1D-3917-40CD-86A0-8A0C6C6DBC3E} = {790511E7-CDDE-4147-80F7-3C76710BEED2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A3707203-1DEF-4E50-8CDA-E469C5B88F2F}
