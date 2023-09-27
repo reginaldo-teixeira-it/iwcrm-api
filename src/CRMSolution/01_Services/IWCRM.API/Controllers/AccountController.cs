@@ -12,7 +12,7 @@ namespace IWCRM.API.Controllers
     public class AccountController : Controller
     {
 
-        [HttpPost]
+        [HttpGet]
         [Route( "login" )]
         [AllowAnonymous]
         public async Task<ActionResult<dynamic>> Authenticate(
@@ -33,7 +33,7 @@ namespace IWCRM.API.Controllers
             return new
             {
                 user = user,
-                token = token
+                token = string.Concat("bearer ", token)
             };
         }
 
