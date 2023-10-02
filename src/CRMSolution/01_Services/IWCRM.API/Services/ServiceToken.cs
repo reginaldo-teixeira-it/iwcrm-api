@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using IWCRM.API.Data;
 using IWCRM.API.Model;
 using Microsoft.IdentityModel.Tokens;
 
@@ -73,14 +74,14 @@ namespace IWCRM.API.Services
 
 		private static List<(string, string)> _refreshTokens = new();
 
-		public static void SaveRefreshToken(string username, string refreshToken)
-		{
-			_refreshTokens.Add(new(username, refreshToken));
-		}
-		public static string GetRefreshToken(string username)
-		{
-			return _refreshTokens.FirstOrDefault(x => x.Item1 == username).Item2;
-		}
+		//public static void SaveRefreshToken( string username, string refreshToken )
+		//{
+		//	_refreshTokens.Add( new( username, refreshToken ) );
+		//}
+		//public static string GetRefreshToken( string username )
+		//{
+		//	return _refreshTokens.FirstOrDefault( x => x.Item1 == username ).Item2;
+		//}
 
 		public static void DeleteRefreshToken(string username, string refreshToken)
 		{
@@ -88,5 +89,19 @@ namespace IWCRM.API.Services
 			_refreshTokens.Remove(token);
 		}
 
-	}
+		public static void SaveRefreshToken( DataContext context, string username,string accessToken, string refreshToken )
+		{
+			var user = context.User.Where( x => x.Username == username ).FirstOrDefault();
+			user.RefreshToken = refreshToken;
+			user.AccessToken = accessToken;
+			context.User.Update(user);
+			context.SaveChanges();
+		}
+
+        public static string GetRefreshToken( DataContext context, string username )
+        {
+            return context.User.Where( x => x.Username == username ).FirstOrDefault().RefreshToken;
+        }
+
+    }
 }
