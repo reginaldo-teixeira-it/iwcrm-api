@@ -48,6 +48,7 @@ namespace IWCRM.API.Controllers
             finally
             {
                 context.Dispose();
+                context = null;
             }
         }
 
@@ -81,6 +82,7 @@ namespace IWCRM.API.Controllers
 			finally
 			{
                 context.Dispose();
+                context = null;
             }
 		}
 
@@ -97,6 +99,7 @@ namespace IWCRM.API.Controllers
 				.ToListAsync();
 
             context.Dispose();
+            context = null;
 
             return users;
 		}

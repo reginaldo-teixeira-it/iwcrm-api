@@ -93,6 +93,7 @@ namespace IWCRM.API.Services
                 user.AccessToken = string.Empty;
                 context.User.Update( user );
                 context.SaveChanges();
+                context = null;
             }
         }
 
@@ -105,6 +106,8 @@ namespace IWCRM.API.Services
                 user.AccessToken = accessToken;
                 context.User.Update( user );
                 context.SaveChanges();
+				context.Dispose();
+				context = null;
             }
         }
 
