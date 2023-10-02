@@ -17,49 +17,71 @@ namespace IWCRM.API.Controllers
 		[AllowAnonymous]
 		public async Task<ActionResult<dynamic>> Authenticate([FromServices] DataContext context,[FromBody] UserLogin model )
 		{
-			var user = await context.User
-				.AsNoTracking()
-				.Where(x => x.Username == model.Username && x.Password == model.Password)
-				.FirstOrDefaultAsync();
-
-			if (user == null)
-				return NotFound(new { message = "Usuário ou senha inválidos" });
-
-			var accessToken = ServiceToken.GenerateToken(user);
-			var refneshToken = ServiceToken.RefreshToken();
-			ServiceToken.SaveRefreshToken( context, user.Username, accessToken, refneshToken );
-
-			// Esconde a senha
-			user.Password = string.Empty;
-			return new
+			try
 			{
-				user = user,
-                accessToken = accessToken,
-                refreshToken = refneshToken
-			};
-		}
+                var user = await context.User
+                    .AsNoTracking()
+                    .Where( x => x.Username == model.Username && x.Password == model.Password )
+                    .FirstOrDefaultAsync();
+
+                if (user == null)
+                    return NotFound( new { message = "Usuário ou senha inválidos" } );
+
+                var accessToken = ServiceToken.GenerateToken( user );
+                var refneshToken = ServiceToken.RefreshToken();
+                ServiceToken.SaveRefreshToken( context, user.Username, accessToken, refneshToken );
+
+                // Esconde a senha
+                user.Password = string.Empty;
+                return new
+                {
+                    user = user,
+                    accessToken = accessToken,
+                    refreshToken = refneshToken
+                };
+            }
+			catch (Exception)
+			{
+
+				throw;
+            }
+            finally
+            {
+                context.Dispose();
+            }
+        }
 
 		[HttpPost]
 		[Route("refresh-token")]
         public async Task<ActionResult<dynamic>> RefreshToken( [FromServices] DataContext context, [FromBody] RefreshTokenModel model )
         {
-			var principal = ServiceToken.GetPrincipalFromExpiredToken( model.AccessToken );
-			var username = principal.Identity.Name;
-			var saveRefreshToken = ServiceToken.GetRefreshToken( context, username );
-			if (saveRefreshToken != model.RefreshToken)
-				throw new SecurityException("Inválid refresh token");
-
-			var newJwtToken = ServiceToken.GenerateToken(principal.Claims);
-			var newRefreshToken = ServiceToken.RefreshToken();
-			ServiceToken.DeleteRefreshToken(username, newJwtToken);
-			ServiceToken.SaveRefreshToken( context, username, newJwtToken, newRefreshToken);
-
-			return new ObjectResult(new
+			try
 			{
-				newtoken = newJwtToken,
-				newrefreshToken = newRefreshToken
-			});
+                var principal = ServiceToken.GetPrincipalFromExpiredToken( model.AccessToken );
+                var username = principal.Identity.Name;
+                var saveRefreshToken = ServiceToken.GetRefreshToken( context, username );
+                if (saveRefreshToken != model.RefreshToken)
+                    throw new SecurityException( "Inválid refresh token" );
 
+                var newJwtToken = ServiceToken.GenerateToken( principal.Claims );
+                var newRefreshToken = ServiceToken.RefreshToken();
+                ServiceToken.DeleteRefreshToken( context, username, newJwtToken );
+                ServiceToken.SaveRefreshToken( context, username, newJwtToken, newRefreshToken );
+
+                return new ObjectResult( new
+                {
+                    newtoken = newJwtToken,
+                    newrefreshToken = newRefreshToken
+                } );
+            }
+			catch (Exception)
+			{
+				throw;
+			}
+			finally
+			{
+                context.Dispose();
+            }
 		}
 
 

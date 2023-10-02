@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using IWCRM.API.Data;
 using IWCRM.API.Model;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace IWCRM.API.Services
@@ -83,11 +84,17 @@ namespace IWCRM.API.Services
 		//	return _refreshTokens.FirstOrDefault( x => x.Item1 == username ).Item2;
 		//}
 
-		public static void DeleteRefreshToken(string username, string refreshToken)
+		public static void DeleteRefreshToken( DataContext context, string username, string refreshToken)
 		{
-			var token = _refreshTokens.FirstOrDefault(x=>x.Item1 == username && x.Item2 == refreshToken);
-			_refreshTokens.Remove(token);
-		}
+            var user = context.User.Where( x => x.Username == username ).FirstOrDefault();
+            if (user != null)
+            {
+                user.RefreshToken = string.Empty;
+                user.AccessToken = string.Empty;
+                context.User.Update( user );
+                context.SaveChanges();
+            }
+        }
 
 		public static void SaveRefreshToken( DataContext context, string username,string accessToken, string refreshToken )
 		{
@@ -98,14 +105,12 @@ namespace IWCRM.API.Services
                 user.AccessToken = accessToken;
                 context.User.Update( user );
                 context.SaveChanges();
-                context.Dispose();
             }
         }
 
         public static string GetRefreshToken( DataContext context, string username )
         { 
             return context.User.Where( x => x.Username == username ).FirstOrDefault().RefreshToken;
-			context.Dispose();
         }
 
     }
