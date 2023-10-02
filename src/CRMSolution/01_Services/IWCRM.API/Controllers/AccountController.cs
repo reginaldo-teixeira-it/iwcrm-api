@@ -27,7 +27,7 @@ namespace IWCRM.API.Controllers
 
 			var accessToken = ServiceToken.GenerateToken(user);
 			var refneshToken = ServiceToken.RefreshToken();
-			ServiceToken.SaveRefreshToken( user.Username, accessToken, refneshToken );
+			ServiceToken.SaveRefreshToken( context, user.Username, accessToken, refneshToken );
 
 			// Esconde a senha
 			user.Password = string.Empty;
@@ -45,14 +45,14 @@ namespace IWCRM.API.Controllers
         {
 			var principal = ServiceToken.GetPrincipalFromExpiredToken( model.AccessToken );
 			var username = principal.Identity.Name;
-			var saveRefreshToken = ServiceToken.GetRefreshToken( username );
+			var saveRefreshToken = ServiceToken.GetRefreshToken( context, username );
 			if (saveRefreshToken != model.RefreshToken)
 				throw new SecurityException("Inválid refresh token");
 
 			var newJwtToken = ServiceToken.GenerateToken(principal.Claims);
 			var newRefreshToken = ServiceToken.RefreshToken();
 			ServiceToken.DeleteRefreshToken(username, newJwtToken);
-			ServiceToken.SaveRefreshToken( username, newJwtToken, newRefreshToken);
+			ServiceToken.SaveRefreshToken( context, username, newJwtToken, newRefreshToken);
 
 			return new ObjectResult(new
 			{
@@ -73,7 +73,10 @@ namespace IWCRM.API.Controllers
 				.User
 				.AsNoTracking()
 				.ToListAsync();
-			return users;
+
+            context.Dispose();
+
+            return users;
 		}
 	}
 }

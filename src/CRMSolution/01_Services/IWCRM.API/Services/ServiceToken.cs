@@ -89,27 +89,23 @@ namespace IWCRM.API.Services
 			_refreshTokens.Remove(token);
 		}
 
-		public static void SaveRefreshToken( string username,string accessToken, string refreshToken )
+		public static void SaveRefreshToken( DataContext context, string username,string accessToken, string refreshToken )
 		{
-            using (var context = new DataContext())
+            var user = context.User.Where( x => x.Username == username ).FirstOrDefault();
+            if (user != null)
             {
-                var user = context.User.Where( x => x.Username == username ).FirstOrDefault();
-                if (user != null)
-                {
-                    user.RefreshToken = refreshToken;
-                    user.AccessToken = accessToken;
-                    context.User.Update( user );
-                    context.SaveChanges();
-                }
+                user.RefreshToken = refreshToken;
+                user.AccessToken = accessToken;
+                context.User.Update( user );
+                context.SaveChanges();
+                context.Dispose();
             }
         }
 
-        public static string GetRefreshToken( string username )
-        {
-            using (var context = new DataContext())
-            {
-                return context.User.Where( x => x.Username == username ).FirstOrDefault().RefreshToken;
-            }
+        public static string GetRefreshToken( DataContext context, string username )
+        { 
+            return context.User.Where( x => x.Username == username ).FirstOrDefault().RefreshToken;
+			context.Dispose();
         }
 
     }
