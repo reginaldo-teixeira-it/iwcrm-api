@@ -1,4 +1,5 @@
 ﻿using IWCRM.API.Data;
+using IWCRM.API.Data.Repo;
 using IWCRM.API.Model;
 using IWCRM.API.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -29,7 +30,7 @@ namespace IWCRM.API.Controllers
 
                 var accessToken = ServiceToken.GenerateToken( user );
                 var refneshToken = ServiceToken.RefreshToken();
-                //ServiceToken.SaveRefreshToken( context, user.Username, accessToken, refneshToken );
+                Repository.SaveRefreshToken( user.Username, accessToken, refneshToken );
 
                 // Esconde a senha
                 user.Password = string.Empty;
