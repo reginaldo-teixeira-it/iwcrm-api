@@ -1,4 +1,5 @@
 ﻿using IWCRM.API.Data;
+using IWCRM.API.Data.Repo;
 using IWCRM.API.Model;
 using IWCRM.API.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -18,7 +19,7 @@ namespace IWCRM.API.Controllers
         [Authorize( Roles = "Administrator" )]
         public async Task<ActionResult<List<Person>>> GetAll( [FromServices] DataContext context )
         {
-            var result = ServiceToken.GetAll();
+            var result = Repository.GetAll();
             // return await context.Person.AsNoTracking().ToListAsync();
             return result;
         }

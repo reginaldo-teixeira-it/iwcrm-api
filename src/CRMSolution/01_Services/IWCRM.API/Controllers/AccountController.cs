@@ -86,7 +86,6 @@ namespace IWCRM.API.Controllers
             }
 		}
 
-
 		[HttpGet]
 		[Route("get-users")]
 		//[Authorize(Roles = "manager")]
