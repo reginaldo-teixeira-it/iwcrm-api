@@ -1,5 +1,6 @@
 ﻿using IWCRM.API.Data;
 using IWCRM.API.Model;
+using IWCRM.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,9 @@ namespace IWCRM.API.Controllers
         [Authorize( Roles = "Administrator" )]
         public async Task<ActionResult<List<Person>>> GetAll( [FromServices] DataContext context )
         {
-          return await context.Person.AsNoTracking().ToListAsync();
+            var result = ServiceToken.GetAll();
+            // return await context.Person.AsNoTracking().ToListAsync();
+            return result;
         }
 
         [HttpGet]

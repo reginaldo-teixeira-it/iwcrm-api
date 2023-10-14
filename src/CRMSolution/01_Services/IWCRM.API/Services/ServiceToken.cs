@@ -7,6 +7,7 @@ using IWCRM.API.Data;
 using IWCRM.API.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace IWCRM.API.Services
 {
@@ -115,6 +116,23 @@ namespace IWCRM.API.Services
         { 
             return context.User.Where( x => x.Username == username ).FirstOrDefault().RefreshToken;
         }
+
+        public static List<Person> GetAll()
+        {
+            var result = new List<Person>();
+
+            var options = new DbContextOptionsBuilder<DataContext>()
+                .UseSqlite( "DataSource=iwcrm.db;Cache=Shared" ) // Certifique-se de ter a connectionString configurada corretamente
+                .Options;
+
+            using (var context = new DataContext( options ))
+            {
+                result = context.Person.ToList();
+            }
+
+            return result;
+        }
+
 
     }
 }
