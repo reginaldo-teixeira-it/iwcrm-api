@@ -1,8 +1,10 @@
 ﻿using IWCRM.API.Data;
+using IWCRM.API.Data.Repo;
 using IWCRM.API.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace IWCRM.API.Controllers
 {
@@ -12,27 +14,35 @@ namespace IWCRM.API.Controllers
 
     public class AddresController : Controller
     {
-        [HttpGet]
-        [Route( "getByid/{id:int}" )]
-        [Authorize( Roles = "Administrator" )]
 
-        public async Task<ActionResult<Address>> GetById( [FromServices] DataContext context, int id )
+        [HttpGet]
+        [Route( "get-all" )]
+        [Authorize( Roles = "Administrator" )]
+        public async Task<ActionResult<List<Address>>> GetAll()
         {
-            return await context.Address.AsNoTracking().FirstOrDefaultAsync( x => x.Id == id );
+            var result = AddressRepository.GetAll().Result;
+            return result;
+        }
+
+        [HttpGet]
+        [Route( "get-byid" )]
+        [Authorize( Roles = "Administrator" )]
+        public async Task<ActionResult<Address>> GetById( int id )
+        {
+            return await AddressRepository.GetById( id );
         }
 
         [HttpPost]
         [Route( "create" )]
         [Authorize( Roles = "Administrator" )]
-        public async Task<ActionResult<Address>> Create( [FromServices] DataContext context, [FromBody] Address model )
+        public async Task<ActionResult<Address>> Create( [FromBody] Address model )
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
             try
             {
-                context.Address.Add( model );
-                await context.SaveChangesAsync();
+                await AddressRepository.Create( model );
 
                 return model;
             }
@@ -44,22 +54,20 @@ namespace IWCRM.API.Controllers
         }
 
         [HttpPut]
-        [Route( "update/{id:int}" )]
+        [Route( "update" )]
         [Authorize( Roles = "Administrator" )]
-
-        public async Task<ActionResult<Address>> Update( [FromServices] DataContext context, [FromBody] Address model, int id )
+        public async Task<ActionResult<Address>> Update([FromBody] Address model )
         {
             if (!ModelState.IsValid)
                 return BadRequest( ModelState );
 
             // Verifica se o ID informado é o mesmo do modelo
-            if (id != model.Id)
-                return NotFound( new { message = "Pessoa não encontrada" } );
+            if ( model.Id <= 0)
+                return NotFound( new { message = "Endereço não encontrada" } );
 
             try
             {
-                context.Entry( model ).State = EntityState.Modified;
-                await context.SaveChangesAsync();
+                await AddressRepository.Update( model );
                 return model;
             }
             catch (Exception)
@@ -69,28 +77,25 @@ namespace IWCRM.API.Controllers
             }
         }
 
-        [HttpPut]
-        [Route( "delete/{id:int}" )]
+        [HttpDelete]
+        [Route( "delete" )]
         [Authorize( Roles = "Administrator" )]
-
-        public async Task<ActionResult<Address>> Delete( [FromServices] DataContext context, [FromBody] Address model, int id )
+        public async Task<ActionResult<Address>> Delete( int id )
         {
             if (!ModelState.IsValid)
                 return BadRequest( ModelState );
 
-            var category = await context.Address.FirstOrDefaultAsync( x => x.Id == id );
-            if (category == null)
+            // Verifica se o ID informado é o mesmo do modelo
+            if (id <= 0)
                 return NotFound( new { message = "Endereço não encontrado" } );
 
             try
             {
-                context.Address.Remove( category );
-                await context.SaveChangesAsync();
-                return model;
+                return await AddressRepository.Delete( id );
             }
             catch (Exception)
             {
-                return BadRequest( new { message = "Não foi possível criar o cadastro" } );
+                return BadRequest( new { message = "Não foi possível remover o cadastro" } );
 
             }
         }

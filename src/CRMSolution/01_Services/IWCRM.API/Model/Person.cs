@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Numerics;
+using System.Text.Json.Serialization;
 
 namespace IWCRM.API.Model
 {
     public class Person 
     {
+
         [Key]
         public long  Id { get; set; }
         public long IdPersonType { get; set; }

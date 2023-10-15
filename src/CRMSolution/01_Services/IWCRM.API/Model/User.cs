@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace IWCRM.API.Model
 {
@@ -18,7 +19,7 @@ namespace IWCRM.API.Model
         public string Password { get; set; }
 
         [Required( ErrorMessage = "Este campo é obrigatório" )]
-        [MaxLength( 20, ErrorMessage = "Este campo deve conter entre 3 e 60 caracteres" )]
+        [MaxLength( 100, ErrorMessage = "Este campo deve conter entre 3 e 60 caracteres" )]
         [MinLength( 3, ErrorMessage = "Este campo deve conter entre 3 e 60 caracteres" )]
         public string Email { get; set; }
 

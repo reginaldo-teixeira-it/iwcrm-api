@@ -17,34 +17,31 @@ namespace IWCRM.API.Controllers
         [HttpGet]
         [Route( "get-all" )]
         [Authorize( Roles = "Administrator" )]
-        public async Task<ActionResult<List<Person>>> GetAll( [FromServices] DataContext context )
+        public async Task<ActionResult<List<Person>>> GetAll()
         {
-            var result = Repository.GetAll();
-            // return await context.Person.AsNoTracking().ToListAsync();
+            var result = PersonRepository.GetAll().Result;
             return result;
         }
 
         [HttpGet]
         [Route( "get-byid/{id:int}" )]
         [Authorize( Roles = "Administrator" )]
-        public async Task<ActionResult<Person>> GetById( [FromServices] DataContext context, int id )
+        public async Task<ActionResult<Person>> GetById( int id )
         {
-            return await context.Person.AsNoTracking().FirstOrDefaultAsync( x => x.Id == id );
+            return await PersonRepository.GetById( id );
         }
 
         [HttpPost]
         [Route( "create" )]
         [Authorize( Roles = "Administrator" )]
-
-        public async Task<ActionResult<Person>> Create( [FromServices] DataContext context,[FromBody] Person model )
+        public async Task<ActionResult<Person>> Create([FromBody] Person model )
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
             try
-            {  
-                context.Person.Add( model );
-                await context.SaveChangesAsync();
+            {
+                await PersonRepository.Create( model );
  
                 return model;
             }
@@ -56,22 +53,21 @@ namespace IWCRM.API.Controllers
         }
 
         [HttpPut]
-        [Route( "update/{id:int}" )]
+        [Route( "update" )]
         [Authorize( Roles = "Administrator" )]
-
-        public async Task<ActionResult<Person>> Update( [FromServices] DataContext context, [FromBody] Person model, int id)
+        public async Task<ActionResult<Person>> Update( [FromBody] Person model)
         {
             if (!ModelState.IsValid)
                 return BadRequest( ModelState );
 
             // Verifica se o ID informado é o mesmo do modelo
-            if (id != model.Id)
+            if ( model.Id <= 0 )
                 return NotFound( new { message = "Pessoa não encontrada" } );
 
             try
             {
-                context.Entry( model ).State = EntityState.Modified;
-                await context.SaveChangesAsync();
+                await PersonRepository.Update( model );
+
                 return model;
             }
             catch (Exception)
@@ -81,25 +77,22 @@ namespace IWCRM.API.Controllers
             }
         }
 
-        [HttpPut]
-        [Route( "delete/{id:int}" )]
+        [HttpDelete]
+        [Route( "delete" )]
         [Authorize( Roles = "Administrator" )]
-
-        public async Task<ActionResult<Person>> Delete( [FromServices] DataContext context, [FromBody] Person model, int id )
+        public async Task<ActionResult<Person>> Delete( int id )
         {
             if (!ModelState.IsValid)
                 return BadRequest( ModelState );
 
             // Verifica se o ID informado é o mesmo do modelo
-            if (id != model.Id)
+            if ( id <= 0)
                 return NotFound( new { message = "Pessoa não encontrada" } );
 
             try
             {
-                model.IsActive = false;
-                context.Entry( model ).State = EntityState.Modified;
-                await context.SaveChangesAsync();
-                return model;
+                
+                return await PersonRepository.Delete( id ); 
             }
             catch (Exception)
             {

@@ -13,12 +13,12 @@ namespace IWCRM.API.Controllers
 	[Route("v1/account")]
 	public class AccountController : Controller
 	{
-		[HttpPost]
+		[HttpGet]
 		[Route("login")]
 		[AllowAnonymous]
 		public async Task<ActionResult<dynamic>> Authenticate([FromBody] UserLogin model )
 		{
-            var user = Repository.GetUserAsync( model ).Result;
+            var user = UserRepository.GetUserAsync( model ).Result;
             //var user = await context.User
             //    .AsNoTracking()
             //    .Where( x => x.Username == model.Username && x.Password == model.Password )
@@ -31,7 +31,7 @@ namespace IWCRM.API.Controllers
             var refneshToken = ServiceToken.RefreshToken();
             try
             {
-                Repository.SaveRefreshToken( user.Username, accessToken, refneshToken );
+                UserRepository.SaveRefreshToken( user.Username, accessToken, refneshToken );
             }
             catch (Exception ex)
             {
@@ -49,55 +49,128 @@ namespace IWCRM.API.Controllers
             };
         }
 
-		[HttpPost]
+		[HttpPut]
 		[Route("refresh-token")]
-        public async Task<ActionResult<dynamic>> RefreshToken( [FromServices] DataContext context, [FromBody] RefreshTokenModel model )
+        public async Task<ActionResult<dynamic>> RefreshToken( [FromBody] RefreshTokenModel model )
         {
-			try
-			{
-                var principal = ServiceToken.GetPrincipalFromExpiredToken( model.AccessToken );
-                var username = principal.Identity.Name;
-                var saveRefreshToken = ServiceToken.GetRefreshToken( context, username );
-                if (saveRefreshToken != model.RefreshToken)
-                    throw new SecurityException( "Inválid refresh token" );
+            var principal = ServiceToken.GetPrincipalFromExpiredToken( model.AccessToken );
+            var username = principal.Identity.Name;
+            var saveRefreshToken = UserRepository.GetRefreshToken( username );
+            if (saveRefreshToken.Result != model.RefreshToken)
+                throw new SecurityException( "Inválid refresh token" );
 
-                var newJwtToken = ServiceToken.GenerateToken( principal.Claims );
-                var newRefreshToken = ServiceToken.RefreshToken();
-                ServiceToken.DeleteRefreshToken( context, username, newJwtToken );
-                ServiceToken.SaveRefreshToken( context, username, newJwtToken, newRefreshToken );
+            var newJwtToken = ServiceToken.GenerateToken( principal.Claims );
+            var newRefreshToken = ServiceToken.RefreshToken();
+            UserRepository.DeleteRefreshToken( username );
+            UserRepository.SaveRefreshToken( username, newJwtToken, newRefreshToken );
 
-                return new ObjectResult( new
-                {
-                    newtoken = newJwtToken,
-                    newrefreshToken = newRefreshToken
-                } );
-            }
-			catch (Exception)
-			{
-				throw;
-			}
-			finally
-			{
-                context.Dispose();
-                context = null;
-            }
-		}
+            return new ObjectResult( new
+            {
+                newtoken = newJwtToken,
+                newrefreshToken = newRefreshToken
+            } );
+        }
 
 		[HttpGet]
-		[Route("get-users")]
-		//[Authorize(Roles = "manager")]
-		[AllowAnonymous]
-		public async Task<ActionResult<List<User>>> Get([FromServices] DataContext context)
+		[Route("get-all")]
+        [Authorize( Roles = "Administrator" )]
+        [AllowAnonymous]
+		public async Task<ActionResult<List<User>>> GetAll()
 		{
-			var users = await context
-				.User
-				.AsNoTracking()
-				.ToListAsync();
-
-            context.Dispose();
-            context = null;
-
+            var users = new List<User>();
+            try
+            {
+                users = await UserRepository.GetUsersAsync();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest( new { message = "Não foi possível listar usuários "+ex.Message } );
+            }
+ 
             return users;
 		}
-	}
+
+        [HttpGet]
+        [Route( "get-byid/{id:int}" )]
+        [Authorize( Roles = "Administrator" )]
+        [AllowAnonymous]
+        public async Task<ActionResult<User>> GetByID( int id )
+        {
+            var users = new User();
+            try
+            {
+                users = await UserRepository.GetByIdAsync( id );
+            }
+            catch (Exception ex)
+            {
+                return BadRequest( new { message = "Não foi possível encontrar o usuário " + ex.Message } );
+            }
+
+            return users;
+        }
+
+        [HttpPost]
+        [Route( "create" )]
+        [Authorize( Roles = "Administrator" )]
+        public async Task<ActionResult<User>> Create([FromBody] User model )
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            try
+            {
+                UserRepository.Create( model );
+
+                return model;
+            }
+            catch (Exception)
+            {
+                return BadRequest( new { message = "Não foi possível criar o usuário" } );
+
+            }
+        }
+
+        [HttpPut]
+        [Route( "update" )]
+        [Authorize( Roles = "Administrator" )]
+        public async Task<ActionResult<User>> Update( [FromBody] User model )
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            try
+            {
+                UserRepository.Update( model );
+
+                return model;
+            }
+            catch (Exception)
+            {
+                return BadRequest( new { message = "Não foi possível atualizar o usuário" } );
+
+            }
+        }
+
+        [HttpDelete]
+        [Route( "delete/{id:int}" )]
+        [Authorize( Roles = "Administrator" )]
+        public async Task<ActionResult<User>> Delete( int id )
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            try
+            {
+               var result =  UserRepository.Delete( id ).Result;
+
+                return result;
+            }
+            catch (Exception)
+            {
+                return BadRequest( new { message = "Não foi possível remover o usuário" } );
+
+            }
+        }
+
+    }
 }
