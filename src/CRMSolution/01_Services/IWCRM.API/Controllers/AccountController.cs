@@ -18,7 +18,7 @@ namespace IWCRM.API.Controllers
 		[AllowAnonymous]
 		public async Task<ActionResult<dynamic>> Authenticate([FromBody] UserLogin model )
 		{
-            var user = Repository.GetUser( model );
+            var user = Repository.GetUserAsync( model ).Result;
             //var user = await context.User
             //    .AsNoTracking()
             //    .Where( x => x.Username == model.Username && x.Password == model.Password )

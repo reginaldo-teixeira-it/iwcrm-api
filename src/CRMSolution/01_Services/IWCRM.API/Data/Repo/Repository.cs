@@ -1,6 +1,7 @@
 ﻿using IWCRM.API.Model;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Data;
 using System.Diagnostics;
 
@@ -18,18 +19,18 @@ namespace IWCRM.API.Data.Repo
            .Options;
         }
   
-        public static User GetUser( UserLogin model )
+        public static async Task<User> GetUserAsync( UserLogin model )
         {
             var user = new User();
-
-            using (var context = new DataContext( GetConfiguration() ))
-            {
-                user = context.User
-                    .AsNoTracking()
-                    .Where( x => x.Username == model.Username && x.Password == model.Password )
-                    .FirstOrDefault();
-                    context.Dispose();
-            }
+ 
+                using (var dbContext = new DataContext( GetConfiguration() ))
+                {
+                    user = await dbContext.User
+                        .AsNoTracking()
+                        .Where( x => x.Username == model.Username && x.Password == model.Password )
+                        .FirstOrDefaultAsync();
+                    dbContext.Dispose();
+                }           
 
             return user;
         }
@@ -59,7 +60,7 @@ namespace IWCRM.API.Data.Repo
                         user.RefreshToken = refreshToken;
                         user.AccessToken = accessToken;
                         dbContext.User.Update( user );
-                        dbContext.SaveChanges();
+                        dbContext.SaveChangesAsync();
                         dbContext.Dispose();
                     }
                 }
