@@ -39,26 +39,26 @@ namespace IWCRM.API.Data.Repo
         {
             var result = new List<Person>();
  
-            using (var context = new DataContext( GetConfiguration() ))
+            using (var dbContext = new DataContext( GetConfiguration() ))
             {
-                result = context.Person.ToList();
-                context.Dispose();
+                result = dbContext.Person.ToList();
+                dbContext.Dispose();
             }
             return result;
         }
 
         public static void SaveRefreshToken( string username, string accessToken, string refreshToken )
         {
-            using (var context = new DataContext( GetConfiguration() ))
+            using (var dbContext = new DataContext( GetConfiguration() ))
             {
-                var user = context.User.Where( x => x.Username == username ).FirstOrDefault();
+                var user = dbContext.User.Where( x => x.Username == username ).FirstOrDefault();
                 if (user != null)
                 {
                     user.RefreshToken = refreshToken;
                     user.AccessToken = accessToken;
-                    context.User.Update( user );
-                    context.SaveChanges();
-                    context.Dispose();
+                    dbContext.User.Update( user );
+                    dbContext.SaveChanges();
+                    dbContext.Dispose();
                 }
             }
         }
