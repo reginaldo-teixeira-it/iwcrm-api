@@ -91,7 +91,7 @@ namespace IWCRM.API.Controllers
 		}
 
         [HttpGet]
-        [Route( "get-byid/{id:int}" )]
+        [Route( "get-byid" )]
         [Authorize( Roles = "Administrator" )]
         [AllowAnonymous]
         public async Task<ActionResult<User>> GetByID( int id )
@@ -152,7 +152,7 @@ namespace IWCRM.API.Controllers
         }
 
         [HttpDelete]
-        [Route( "delete/{id:int}" )]
+        [Route( "delete" )]
         [Authorize( Roles = "Administrator" )]
         public async Task<ActionResult<User>> Delete( int id )
         {
