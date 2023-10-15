@@ -11,7 +11,7 @@ namespace IWCRM.API.Data.Repo
  
         public Repository(){}
 
-
+        private static object databaseLock = new object();
         public static DbContextOptions<DataContext> GetConfiguration()
         {   return new DbContextOptionsBuilder<DataContext>()
            .UseSqlite( "DataSource=iwcrm.db;Cache=Shared" )  
@@ -49,18 +49,22 @@ namespace IWCRM.API.Data.Repo
 
         public static void SaveRefreshToken( string username, string accessToken, string refreshToken )
         {
-            using (var dbContext = new DataContext( GetConfiguration() ))
+            lock (databaseLock)
             {
-                var user = dbContext.User.Where( x => x.Username == username ).FirstOrDefault();
-                if (user != null)
+                using (var dbContext = new DataContext( GetConfiguration() ))
                 {
-                    user.RefreshToken = refreshToken;
-                    user.AccessToken = accessToken;
-                    dbContext.User.Update( user );
-                    dbContext.SaveChanges();
-                    dbContext.Dispose();
+                    var user = dbContext.User.Where( x => x.Username == username ).FirstOrDefault();
+                    if (user != null)
+                    {
+                        user.RefreshToken = refreshToken;
+                        user.AccessToken = accessToken;
+                        dbContext.User.Update( user );
+                        dbContext.SaveChanges();
+                        dbContext.Dispose();
+                    }
                 }
             }
+
         }
  
     }
