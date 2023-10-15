@@ -16,42 +16,29 @@ namespace IWCRM.API.Controllers
 		[HttpPost]
 		[Route("login")]
 		[AllowAnonymous]
-		public async Task<ActionResult<dynamic>> Authenticate([FromServices] DataContext context,[FromBody] UserLogin model )
+		public async Task<ActionResult<dynamic>> Authenticate([FromBody] UserLogin model )
 		{
-			try
-			{
-                var user = Repository.GetUser( model );
-                //var user = await context.User
-                //    .AsNoTracking()
-                //    .Where( x => x.Username == model.Username && x.Password == model.Password )
-                //    .FirstOrDefaultAsync();
+            var user = Repository.GetUser( model );
+            //var user = await context.User
+            //    .AsNoTracking()
+            //    .Where( x => x.Username == model.Username && x.Password == model.Password )
+            //    .FirstOrDefaultAsync();
 
-                if (user == null)
-                    return NotFound( new { message = "Usuário ou senha inválidos" } );
+            if (user == null)
+                return NotFound( new { message = "Usuário ou senha inválidos" } );
 
-                var accessToken = ServiceToken.GenerateToken( user );
-                var refneshToken = ServiceToken.RefreshToken();
-                Repository.SaveRefreshToken( user.Username, accessToken, refneshToken );
+            var accessToken = ServiceToken.GenerateToken( user );
+            var refneshToken = ServiceToken.RefreshToken();
+            Repository.SaveRefreshToken( user.Username, accessToken, refneshToken );
 
-                // Esconde a senha
-                user.Password = string.Empty;
-                return new
-                {
-                    user = user,
-                    accessToken = accessToken,
-                    refreshToken = refneshToken
-                };
-            }
-			catch (Exception)
-			{
-
-				throw;
-            }
-            finally
+            // Esconde a senha
+            user.Password = string.Empty;
+            return new
             {
-                context.Dispose();
-                context = null;
-            }
+                user = user,
+                accessToken = accessToken,
+                refreshToken = refneshToken
+            };
         }
 
 		[HttpPost]

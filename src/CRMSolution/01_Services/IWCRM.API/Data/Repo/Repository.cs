@@ -1,9 +1,8 @@
 ﻿using IWCRM.API.Model;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
-using Microsoft.EntityFrameworkCore.Query.Internal;
-using System;
+using System.Data;
+using System.Diagnostics;
 
 namespace IWCRM.API.Data.Repo
 {
@@ -29,8 +28,7 @@ namespace IWCRM.API.Data.Repo
                     .AsNoTracking()
                     .Where( x => x.Username == model.Username && x.Password == model.Password )
                     .FirstOrDefault();
-                context.Dispose();
-
+                    context.Dispose();
             }
 
             return user;
@@ -46,7 +44,6 @@ namespace IWCRM.API.Data.Repo
                 result = context.Person.ToList();
                 context.Dispose();
             }
-
             return result;
         }
 
@@ -63,10 +60,8 @@ namespace IWCRM.API.Data.Repo
                     context.SaveChanges();
                     context.Dispose();
                 }
-            } 
+            }
         }
-
-
-
+ 
     }
 }
