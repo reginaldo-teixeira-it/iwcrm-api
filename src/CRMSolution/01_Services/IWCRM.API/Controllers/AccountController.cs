@@ -29,7 +29,15 @@ namespace IWCRM.API.Controllers
 
             var accessToken = ServiceToken.GenerateToken( user );
             var refneshToken = ServiceToken.RefreshToken();
-            Repository.SaveRefreshToken( user.Username, accessToken, refneshToken );
+            try
+            {
+                Repository.SaveRefreshToken( user.Username, accessToken, refneshToken );
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest( ex.Message );
+            }
 
             // Esconde a senha
             user.Password = string.Empty;
