@@ -1,4 +1,5 @@
 ﻿using IWCRM.API.Model;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 using Microsoft.EntityFrameworkCore.Query.Internal;
@@ -18,6 +19,24 @@ namespace IWCRM.API.Data.Repo
            .Options;
         }
   
+        public static User GetUser( UserLogin model )
+        {
+            var user = new User();
+
+            using (var context = new DataContext( GetConfiguration() ))
+            {
+                user = context.User
+                    .AsNoTracking()
+                    .Where( x => x.Username == model.Username && x.Password == model.Password )
+                    .FirstOrDefault();
+                context.Dispose();
+
+            }
+
+            return user;
+        }
+
+
         public static List<Person> GetAll()
         {
             var result = new List<Person>();
@@ -25,6 +44,7 @@ namespace IWCRM.API.Data.Repo
             using (var context = new DataContext( GetConfiguration() ))
             {
                 result = context.Person.ToList();
+                context.Dispose();
             }
 
             return result;
@@ -41,6 +61,7 @@ namespace IWCRM.API.Data.Repo
                     user.AccessToken = accessToken;
                     context.User.Update( user );
                     context.SaveChanges();
+                    context.Dispose();
                 }
             } 
         }

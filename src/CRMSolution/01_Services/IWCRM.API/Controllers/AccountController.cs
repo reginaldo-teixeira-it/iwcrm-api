@@ -20,10 +20,11 @@ namespace IWCRM.API.Controllers
 		{
 			try
 			{
-                var user = await context.User
-                    .AsNoTracking()
-                    .Where( x => x.Username == model.Username && x.Password == model.Password )
-                    .FirstOrDefaultAsync();
+                var user = Repository.GetUser( model );
+                //var user = await context.User
+                //    .AsNoTracking()
+                //    .Where( x => x.Username == model.Username && x.Password == model.Password )
+                //    .FirstOrDefaultAsync();
 
                 if (user == null)
                     return NotFound( new { message = "Usuário ou senha inválidos" } );
