@@ -5,6 +5,7 @@ using IWCRM.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using System.Security;
 
@@ -100,6 +101,13 @@ namespace IWCRM.API.Controllers
             try
             {
                 users = await UserRepository.GetByIdAsync( id );
+                if (users == null)
+                {
+                    return new ObjectResult( new { message = "Não foi possível encontrar o usuário" } )
+                    {
+                        StatusCode = StatusCodes.Status204NoContent
+                    };
+                }
             }
             catch (Exception ex)
             {
