@@ -61,7 +61,7 @@ builder.Services.AddSwaggerGen( c =>
     {
         Title = "IWCRM - Infowest CRM Api"
         ,
-        Description = "Controle de Contatos, User : Admin Password : !Demo123"
+        Description = "Controle de Contatos, User : dev.mail@infowest.com.br Password : develop2023@"
         ,
         Version = "1.0.0 " ,
     } );

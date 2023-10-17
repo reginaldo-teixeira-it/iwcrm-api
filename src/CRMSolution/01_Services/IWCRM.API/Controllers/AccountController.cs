@@ -14,8 +14,8 @@ namespace IWCRM.API.Controllers
 	[Route("v1/account")]
 	public class AccountController : Controller
 	{
-		[HttpGet]
-		[Route("login")]
+		[HttpPost]
+		[Route( "signin" )]
 		[AllowAnonymous]
 		public async Task<ActionResult<dynamic>> Authenticate([FromBody] UserLogin model )
 		{
@@ -26,7 +26,7 @@ namespace IWCRM.API.Controllers
             //    .FirstOrDefaultAsync();
 
             if (user == null)
-                return NotFound( new { message = "Usuário ou senha inválidos" } );
+                return NotFound( new { errorMessage = "Usuário ou senha inválidos" } );
 
             var accessToken = ServiceToken.GenerateToken( user );
             var refneshToken = ServiceToken.RefreshToken();
@@ -44,7 +44,7 @@ namespace IWCRM.API.Controllers
             user.Password = string.Empty;
             return new
             {
-                user = user,
+                //user = user,
                 accessToken = accessToken,
                 refreshToken = refneshToken
             };
