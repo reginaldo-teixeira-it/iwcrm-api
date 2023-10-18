@@ -120,7 +120,7 @@ namespace IWCRM.API.Controllers
         [HttpPost]
         [Route( "create" )]
         [Authorize( Roles = "Administrator" )]
-        public async Task<ActionResult<User>> Create([FromBody] User model )
+        public async Task<ActionResult<User>> CreateUsr([FromBody] User model )
         {
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -141,7 +141,7 @@ namespace IWCRM.API.Controllers
         [HttpPut]
         [Route( "update" )]
         [Authorize( Roles = "Administrator" )]
-        public async Task<ActionResult<User>> Update( [FromBody] User model )
+        public async Task<ActionResult<User>> UpdateUsr( [FromBody] User model )
         {
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -162,7 +162,7 @@ namespace IWCRM.API.Controllers
         [HttpDelete]
         [Route( "delete" )]
         [Authorize( Roles = "Administrator" )]
-        public async Task<ActionResult<User>> Delete( int id )
+        public async Task<ActionResult<User>> DeleteUsr( int id )
         {
             if (!ModelState.IsValid)
                 return BadRequest();
